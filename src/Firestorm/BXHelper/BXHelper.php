@@ -1,6 +1,5 @@
 <?
 namespace Firestorm\BXHelper;
-
 \CModule::IncludeModule('iblock');
 
 class BXHelper {
