@@ -122,7 +122,7 @@ class BXHelper {
         return htmlspecialchars(json_encode($var));
     }
 
-    public static function getEditArea () {
+    public static function getEditArea ($template, $arItem) {
     	$template->AddEditAction($arItem['ID'], $arItem['EDIT_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_EDIT"));
         $template->AddDeleteAction($arItem['ID'], $arItem['DELETE_LINK'], CIBlock::GetArrayByID($arItem["IBLOCK_ID"], "ELEMENT_DELETE"), array("CONFIRM" => GetMessage('CT_BNL_ELEMENT_DELETE_CONFIRM')));
         return $template->GetEditAreaId($arItem['ID']);
