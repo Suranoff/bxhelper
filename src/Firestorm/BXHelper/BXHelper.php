@@ -1,7 +1,7 @@
 <?
 namespace Firestorm\BXHelper;
 
-CModule::IncludeModule('iblock');
+\CModule::IncludeModule('iblock');
 
 class BXHelper {
 
@@ -18,7 +18,7 @@ class BXHelper {
 
 
     public static function Init () {
-        static::$obCache = new CPHPCache();
+        static::$obCache = new \CPHPCache();
         if (!empty($_GET['clear_cache'])) {
             BXClearCache('/BXHelper/');
         }
@@ -50,8 +50,8 @@ class BXHelper {
         $result = array();
         if ($use_cache) $iblock_list = static::getCache(__FUNCTION__.'_list');
         if (!is_array($iblock_list['RESULT'])) {
-            CModule::IncludeModule('iblock');
-            $dbResult = CIBlock::GetList();
+            \CModule::IncludeModule('iblock');
+            $dbResult = \CIBlock::GetList();
             while ($next = $dbResult->fetch()) {
                 $iblock_list['RESULT'][] = $next;
             }
@@ -59,10 +59,10 @@ class BXHelper {
         }
         if ($use_cache) $arIblock = static::getCache(__FUNCTION__.'_iblock');
         if (!is_array($arIblock['RESULT'])) {
-            CModule::IncludeModule('iblock');
+            \CModule::IncludeModule('iblock');
             foreach ($iblock_list['RESULT'] as $iblock) {
                 if ($iblock['CODE'] == $code) {
-                    $dbResult = CIBlock::GetSite($iblock['ID']);
+                    $dbResult = \CIBlock::GetSite($iblock['ID']);
                     while ($next = $dbResult->getNext()) {
                         if ($next['SITE_ID'] == $site_id) {
                             $arIblock['RESULT'][] = $iblock;
@@ -117,24 +117,24 @@ class BXHelper {
         }
     }
     public static function ajax ($var) {
-        print(str_replace("'","\"",CUtil::PhpToJSObject($var)));
+        print(str_replace("'","\"",\CUtil::PhpToJSObject($var)));
     }
     public static function js_data($var) {
         return htmlspecialchars(json_encode($var));
     }
 
     public static function getEditArea () {
-        
+
     }
 
     // TODO доделать до полной синхронизации
     /*public static function syncListPropToSection ($iblock_id, $prop_id) {
         if (intval($iblock_id) && intval($prop_id) > 0) {
-            CModule::IncudeModule('iblock');
+            \CModule::IncudeModule('iblock');
             $arSectionVariants = array();
-            $obProperty = new CIBlockProperty;
+            $obProperty = new \CIBlockProperty;
             $dbResult = $obProperty->GetPropertyEnum($prop_id);
-            $dbResult = CIBlockSection::GetList(array(), array(''), false, array('ID','CODE', 'NAME', 'SORT'));
+            $dbResult = \CIBlockSection::GetList(array(), array(''), false, array('ID','CODE', 'NAME', 'SORT'));
             while ($next = $dbResult->GetNext()) {
                 $next['VALUE'] = $next['NAME'];
                 $next['XML_ID'] = 'xml_section_'.$next['CODE'];
@@ -145,16 +145,16 @@ class BXHelper {
                 $arSectionVariants[] = $next;
             }
 
-            $obProperty = new CIBlockProperty;
+            $obProperty = new \CIBlockProperty;
             return $obProperty->UpdateEnum($prop_id, $arSectionVariants);
         }
         return false;
     }*/
     public static function syncSectionToListProp ($iblock_id, $prop_id) {
         if (intval($iblock_id) && intval($prop_id) > 0) {
-            CModule::IncludeModule('iblock');
+            \CModule::IncludeModule('iblock');
             $arSectionVariants = array();
-            $dbResult = CIBlockSection::GetList(array(), array(''), false, array('ID','CODE', 'NAME', 'SORT'));
+            $dbResult = \CIBlockSection::GetList(array(), array(''), false, array('ID','CODE', 'NAME', 'SORT'));
             while ($next = $dbResult->GetNext()) {
                 if (!empty($next['NAME']) && !empty($next['CODE'])) {
                     $next['VALUE'] = $next['NAME'];
@@ -167,7 +167,7 @@ class BXHelper {
                 }
             }
 
-            $obProperty = new CIBlockProperty;
+            $obProperty = new \CIBlockProperty;
             return $obProperty->UpdateEnum($prop_id, $arSectionVariants);
         }
         return false;
@@ -189,8 +189,8 @@ class BXHelper {
         return trim($res);
     }
     public static function getPropertyByID ($id, $field_as_key = 'ID') {
-        CModule::IncludeModule('iblock');
-        $dbResult = CIBlockPirogovProperty::GetList(array(), array('ID' => $id));
+        \CModule::IncludeModule('iblock');
+        $dbResult = \CIBlockPirogovProperty::GetList(array(), array('ID' => $id));
         while ($next = $dbResult->GetNext()) {
             $ar_property[$next[$field_as_key]] = $next;
         }
@@ -248,11 +248,11 @@ class BXHelper {
         foreach ($userf_codes as $uf_code) {
             if (is_array($arItem[$uf_code]) && count($arItem[$uf_code]) > 0) {
                 foreach ($arItem[$uf_code] as &$img) {
-                    $arFile = CFile::ResizeImageGet($img, array('width' => $resize[0], 'height' => $resize[1]), BX_RESIZE_IMAGE_PROPORTIONAL_ALT);
+                    $arFile = \CFile::ResizeImageGet($img, array('width' => $resize[0], 'height' => $resize[1]), BX_RESIZE_IMAGE_PROPORTIONAL_ALT);
                     $img = array('ID' => $img, 'SRC' => $arFile['src']);
                 }
             } else if (intval($arItem[$uf_code])) {
-                $arFile = CFile::ResizeImageGet( $arItem[$uf_code], array('width' => $resize[0], 'height' => $resize[1]), BX_RESIZE_IMAGE_PROPORTIONAL_ALT);
+                $arFile = \CFile::ResizeImageGet( $arItem[$uf_code], array('width' => $resize[0], 'height' => $resize[1]), BX_RESIZE_IMAGE_PROPORTIONAL_ALT);
                 $arItem[$uf_code] = array('ID' => $arItem[$uf_code], 'SRC' => $arFile['src']);
             }
         }
@@ -262,8 +262,8 @@ class BXHelper {
         $param_string = serialize(func_get_args());
         if ($use_cache) $result = static::getCache(__FUNCTION__.$param_string.'_list');
         if (!is_array($result['RESULT'])) {
-            CModule::IncludeModule('iblock');
-            $dbResult = CIBlockElement::GetList($arOrder, $arFilter, $arGroup, $arNavigation, $arSelect);
+            \CModule::IncludeModule('iblock');
+            $dbResult = \CIBlockElement::GetList($arOrder, $arFilter, $arGroup, $arNavigation, $arSelect);
             if (preg_grep ('/^PROPERTY_/', $arSelect)) {
                 while ($next = $dbResult->GetNext()) {
                     if (!$field_as_key) {
@@ -320,7 +320,7 @@ class BXHelper {
         $param_string = serialize(func_get_args());
         if ($use_cache) $result = static::getCache(__FUNCTION__.$param_string.'_site');
         if (!is_array($result['RESULT'])) {
-            $dbResult = CSite::GetList($arOrder[0], $arOrder[1], $arFilter);
+            $dbResult = \CSite::GetList($arOrder[0], $arOrder[1], $arFilter);
             while ($next = $dbResult->GetNext()) {
                 $result['RESULT'][] = $next;
             }
@@ -359,7 +359,7 @@ class BXHelper {
 
     public static function getResizedPictureByID($file_id, $resize = array('width' => 200, 'height' => 200), $resize_type) {
         if (intval($file_id)) {
-            $obFile = new CFile();
+            $obFile = new \CFile();
             $arFile = $obFile->ResizeImageGet($file_id, $resize, $resize_type);
             return $arFile["src"];
         }
@@ -387,7 +387,7 @@ class BXHelper {
         }
         //pr($lang_codes);
         $arProperty_codes = array();
-        $arProperties = BXHelper::getProperties(array(), array('IBLOCK_ID' => $iblock_id),'ID',false);
+        $arProperties = static::getProperties(array(), array('IBLOCK_ID' => $iblock_id),'ID',false);
         foreach ($arProperties['RESULT'] as $arProp) {
             if (in_array($arProp['CODE'],$lang_codes)) {
                 $arProperty_codes[] = $arProp['CODE'];
@@ -528,8 +528,8 @@ class BXHelper {
         $param_string = serialize(func_get_args());
         if ($use_cache) $result = static::getCache(__FUNCTION__.$param_string.'_section');
         if (!is_array($result['RESULT'])) {
-            CModule::IncludeModule('iblock');
-            $dbResult = CIBlockSection::GetList($arOrder, $arFilter, $arNavigation, $arSelect);
+            \CModule::IncludeModule('iblock');
+            $dbResult = \CIBlockSection::GetList($arOrder, $arFilter, $arNavigation, $arSelect);
             while ($next = $dbResult->GetNext()) {
                 if ($as_key) {
                     $result['RESULT'][$next[$as_key]] = $next;
@@ -553,11 +553,11 @@ class BXHelper {
 
         if ($use_cache) $result = static::getCache(__FUNCTION__.$param_string.'_form_result');
         if (!is_array($result['RESULT'])) {
-            CModule::IncludeModule('form');
-            $dbResult = CFormResult::GetList($form_id, $by, $order, $arFilter, $is_filtered);
+            \CModule::IncludeModule('form');
+            $dbResult = \CFormResult::GetList($form_id, $by, $order, $arFilter, $is_filtered);
             static::setCache(__FUNCTION__.$param_string.'_section', $result['RESULT']);
             while ($next = $dbResult->GetNext()) {
-                CFormResult::GetDataByID($next['ID'], $selectAnswerFields, $arResultFields, $arAnswers);
+                \CFormResult::GetDataByID($next['ID'], $selectAnswerFields, $arResultFields, $arAnswers);
                 $next = array_merge($next, $arResultFields);
                 $next['ANSWERS'] = $arAnswers;
                 $result['RESULT'][] = $next;
@@ -569,7 +569,7 @@ class BXHelper {
 
     public static function getUserDisplayName($user_id, $arUsers = array()) {
         if (empty($arUsers)) {
-            $arUsers = BXHelper::getUserVariants($user_id);
+            $arUsers = static::getUserVariants($user_id);
         }
         if (!empty($arUsers[$user_id]['NAME']) && !empty($arUsers[$user_id]['LAST_NAME'])) {
             $display_name = $arUsers[$user_id]['NAME']." ".$arUsers[$user_id]['LAST_NAME'];
@@ -583,7 +583,7 @@ class BXHelper {
         $param_string = serialize(func_get_args());
         $result = static::getCache(__FUNCTION__.$param_string.'_codelink');
 
-        if ( strval($result['RESULT']) <= 0 && CModule::IncludeModule('iblock')) {
+        if ( strval($result['RESULT']) <= 0 && \CModule::IncludeModule('iblock')) {
             $result['RESULT']['EXIST'] = 1;
             $size = count($code_array);
             $element_linked_array = array();
@@ -593,7 +593,7 @@ class BXHelper {
                     if ($key != $size-1) {
                         $filter["PROPERTY_CHILD_ELEMENTS.CODE"] = array($code_array[$key+1]);
                     }
-                    $dbResult = CIBlockElement::GetList(
+                    $dbResult = \CIBlockElement::GetList(
                         array(),
                         $filter,
                         false, array('nTopCount' => 1), array('ID','NAME','CODE')
@@ -607,7 +607,7 @@ class BXHelper {
                     }
                 }
             } else {
-                $dbResult = CIBlockElement::GetList(
+                $dbResult = \CIBlockElement::GetList(
                     array(),
                     array(
                         "IBLOCK_ID" => $iblock_id,
@@ -626,7 +626,7 @@ class BXHelper {
             $result['RESULT']['ELEMENT_LINKED'] = $element_linked_array;
             static::setCache(__FUNCTION__.$param_string.'_check', $result['RESULT']);
 
-        } else if (!CModule::IncludeModule('iblock')) {
+        } else if (!\CModule::IncludeModule('iblock')) {
             return false;
         }
         return $result['RESULT'];
@@ -671,7 +671,7 @@ class BXHelper {
 
     /*public static function translitIblockCodes() {
         $result = BXHelper::getElements(array(), array('IBLOCK_ID' => '7'), false, false, array(), false);
-        $el = new CIBlockElement();
+        $el = new \CIBlockElement();
         foreach ($result['RESULT'] as $res) {
             if (empty($res['CODE'])) {
                 $el->Update($res['ID'], array('CODE' => $res['NAME']));
@@ -723,7 +723,7 @@ class BXHelper {
         }
 
         if ($use_sort) {
-            BXHelper::recursiveMenuSort($menu_links);
+            static::recursiveMenuSort($menu_links);
 
         }
         return $menu_links;
@@ -732,8 +732,8 @@ class BXHelper {
     public static function recursiveMenuSort(&$menu) {
         foreach ($menu as &$menu_entry) {
             if (count($menu_entry['CHILDREN']) > 0) {
-                BXHelper::complex_sort($menu_entry['CHILDREN'], array('SORT'));
-                BXHelper::recursiveMenuSort($menu_entry['CHILDREN']);
+                static::complex_sort($menu_entry['CHILDREN'], array('SORT'));
+                static::recursiveMenuSort($menu_entry['CHILDREN']);
             }
         }
     }
@@ -787,7 +787,7 @@ class BXHelper {
         }
         if (empty($result['RESULT'])) {
             $arProperties = array();
-            $dbResult = CIBlockProperty::GetPropertyEnum($prop_id, $arOrder, $arFilter);
+            $dbResult = \CIBlockProperty::GetPropertyEnum($prop_id, $arOrder, $arFilter);
             while ($next = $dbResult->GetNext()) {
                 $arProperties[$next[$field_as_key]] = $next;
             }
@@ -805,7 +805,7 @@ class BXHelper {
         }
         if (empty($result['RESULT'])) {
             $file_name = basename($file_name);
-            $obFile = new CFile();
+            $obFile = new \CFile();
             $arFile = $obFile->GetList(array(), array("FILE_NAME" => $file_name))->GetNext();
             $result['RESULT'] = $arFile;
             static::setCache(__FUNCTION__.$param_string.'_file', $result['RESULT']);
@@ -819,7 +819,7 @@ class BXHelper {
             $result = static::getCache(__FUNCTION__.$param_string.'_file');
         }
         if (empty($result['RESULT'])) {
-            $obFile = new CFile();
+            $obFile = new \CFile();
             $arFile = $obFile->GetList(array(), array("EXTERNAL_ID" => $hash))->GetNext();
             $result['RESULT'] = $arFile;
             static::setCache(__FUNCTION__.$param_string.'_file', $result['RESULT']);
@@ -832,7 +832,7 @@ class BXHelper {
         if ($use_cache) $result = static::getCache(__FUNCTION__.$param_string.'_prop_enum');
         if (empty($result['RESULT'])) {
             $arProperties = array();
-            $dbResult = CIBlockPropertyEnum::GetList($arOrder, $arFilter);
+            $dbResult = \CIBlockPropertyEnum::GetList($arOrder, $arFilter);
             while ($next = $dbResult->GetNext()) {
                 $arProperties[$next[$field_as_key]] = $next;
             }
@@ -889,8 +889,8 @@ class BXHelper {
         global $DB;
         $hl_result = $DB->Query("SELECT * FROM b_hlblock_entity WHERE TABLE_NAME='$table_name'")->getNext();
         if (intval($hl_result['ID'])) {
-            $hlblock   = Bitrix\Highloadblock\HighloadBlockTable::getById( $hl_result['ID'] )->fetch();
-            $entity   = Bitrix\Highloadblock\HighloadBlockTable::compileEntity( $hlblock );
+            $hlblock   = \Bitrix\Highloadblock\HighloadBlockTable::getById( $hl_result['ID'] )->fetch();
+            $entity   = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity( $hlblock );
 
             $entity_data_class = $entity->getDataClass();
             return $entity_data_class::add($field_values);
@@ -902,8 +902,8 @@ class BXHelper {
         global $DB;
         $hl_result = $DB->Query("SELECT * FROM b_hlblock_entity WHERE TABLE_NAME='$table_name'")->getNext();
         if (intval($hl_result['ID'])) {
-            $hlblock   = Bitrix\Highloadblock\HighloadBlockTable::getById( $hl_result['ID'] )->fetch();
-            $entity   = Bitrix\Highloadblock\HighloadBlockTable::compileEntity( $hlblock );
+            $hlblock   = \Bitrix\Highloadblock\HighloadBlockTable::getById( $hl_result['ID'] )->fetch();
+            $entity   = \Bitrix\Highloadblock\HighloadBlockTable::compileEntity( $hlblock );
 
             $entity_data_class = $entity->getDataClass();
             return $entity_data_class::getList(array('select' => $arSelect));
@@ -932,7 +932,7 @@ class BXHelper {
             }
             $by = "id";
             $order = "asc";
-            $obUser = new CUser();
+            $obUser = new \CUser();
             $dbResult = $obUser->GetList($by, $order, $arFilter, $arParams);
             while ($next = $dbResult->GetNext()) {
                 $arResult[$next['ID']] = $next;
@@ -949,11 +949,11 @@ class BXHelper {
     }
     public static function ajax_buffer_release ($condition = false) {
         if (isAjax())
-        if ($condition) {
-            ob_end_flush();
-        } else {
-            ob_end_clean();
-        }
+            if ($condition) {
+                ob_end_flush();
+            } else {
+                ob_end_clean();
+            }
     }
     public static function ajax_buffer_toggle ($condition = false) {
         static::ajax_buffer_release($condition);
@@ -977,9 +977,9 @@ class BXHelper {
             }
         } else {
             if ($get_element) {
-                $content = BXHelper::utf8_to_entities($content);
+                $content = static::utf8_to_entities($content);
 
-                $obHtml = Sunra\PhpSimple\HtmlDomParser::str_get_html( $content );
+                $obHtml = \Sunra\PhpSimple\HtmlDomParser::str_get_html( $content );
 
                 foreach($obHtml->find($get_element) as $element) {
                     if ($get_inner_html) echo $element->innertext;
@@ -987,8 +987,8 @@ class BXHelper {
 
                 }
             } else if ($get_inner_html)  {
-                $content = BXHelper::utf8_to_entities($content);
-                $obHtml = Sunra\PhpSimple\HtmlDomParser::str_get_html( $content );
+                $content = static::utf8_to_entities($content);
+                $obHtml = \Sunra\PhpSimple\HtmlDomParser::str_get_html( $content );
                 echo $obHtml->firstChild()->innertext;
             } else
                 echo $content;
@@ -1010,29 +1010,29 @@ class BXHelper {
     }
 
     public static function  getXpathSubquery($expression){
-    $query = '';
-    if (preg_match("/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)=(?P<value>\S+)\])?(#(?P<id>\S+))?(\.(?P<class>\S+))?/ims", $expression, $subs)){
-        $tag = $subs['tag'];
-        $id = $subs['id'];
-        $attr = $subs['attr'];
-        $attrValue = $subs['value'];
-        $class = $subs['class'];
-        if (!strlen($tag))
-            $tag = '*';
-        $query = '//'.$tag;
-        if (strlen($id)){
-            $query .= "[@id='".$id."']";
+        $query = '';
+        if (preg_match("/(?P<tag>[a-z0-9]+)?(\[(?P<attr>\S+)=(?P<value>\S+)\])?(#(?P<id>\S+))?(\.(?P<class>\S+))?/ims", $expression, $subs)){
+            $tag = $subs['tag'];
+            $id = $subs['id'];
+            $attr = $subs['attr'];
+            $attrValue = $subs['value'];
+            $class = $subs['class'];
+            if (!strlen($tag))
+                $tag = '*';
+            $query = '//'.$tag;
+            if (strlen($id)){
+                $query .= "[@id='".$id."']";
+            }
+            if (strlen($attr)){
+                $query .= "[@".$attr."='".$attrValue."']";
+            }
+            if (strlen($class)){
+                //$query .= "[@class='".$class."']";
+                $query .= '[contains(concat(" ", normalize-space(@class), " "), " '.$class.' ")]';
+            }
         }
-        if (strlen($attr)){
-            $query .= "[@".$attr."='".$attrValue."']";
-        }
-        if (strlen($class)){
-            //$query .= "[@class='".$class."']";
-            $query .= '[contains(concat(" ", normalize-space(@class), " "), " '.$class.' ")]';
-        }
+        return $query;
     }
-    return $query;
-}
 
     public static function buildUrl ($root, $query_array) {
         $url = false;
@@ -1472,7 +1472,7 @@ class BXHelper {
             $ar_raw_codes[] = $raw_code;
             $ar_sort_codes[] = $sort_code;
         }
-        $properties = BXHelper::getProperties(array(), array('IBLOCK_ID' => $arFields['IBLOCK_ID']),array('ID','CODE'), 'ID', false);
+        $properties = static::getProperties(array(), array('IBLOCK_ID' => $arFields['IBLOCK_ID']),array('ID','CODE'), 'ID', false);
 
         foreach ($arFields['PROPERTY_VALUES'] as $key => $arPropVal) {
             $code = $properties['RESULT'][$key]['CODE'];
@@ -1538,16 +1538,16 @@ class BXHelper {
         if (!empty($arEnumSelect)) {
             $ufe = 'ufe';
             $ufe_long = 'b_user_field_enum';
-            $arEnumSelect = self::filterTableNames($ufe_long, $arEnumSelect, "ENUM_", true);
+            $arEnumSelect = static::filterTableNames($ufe_long, $arEnumSelect, "ENUM_", true);
         }
 
         if (!empty($arLangSelect)) {
             $ufl = 'ufl';
             $ufl_long = 'b_user_field_lang';
-            $arLangSelect = self::filterTableNames($ufl_long, $arLangSelect, "LANG_", true);
+            $arLangSelect = static::filterTableNames($ufl_long, $arLangSelect, "LANG_", true);
         }
 
-        $arSelect = self::filterTableNames($uft_long, $arSelect);
+        $arSelect = static::filterTableNames($uft_long, $arSelect);
 
 
         if (empty($arSelect)) {
@@ -1723,8 +1723,8 @@ class BXHelper {
 
     public static function getBasketUserFilter()
     {
-        CModule::IncludeModule('sale');
-        $fUserID = IntVal(CSaleBasket::GetBasketUserID(True));
+        \CModule::IncludeModule('sale');
+        $fUserID = IntVal(\CSaleBasket::GetBasketUserID(True));
         return ($fUserID > 0)
             ? array("FUSER_ID" => $fUserID, "LID" => SITE_ID, "ORDER_ID" => "NULL")
             : null; // no basket for current user
@@ -1732,11 +1732,11 @@ class BXHelper {
 
     public static function getBasketTotalPrice($currency)
     {
-        CModule::IncludeModule('sale');
+        \CModule::IncludeModule('sale');
         if (! ($userFilter = static::getBasketUserFilter()))
             return array();
 
-        $rsBasket = CSaleBasket::GetList(
+        $rsBasket = \CSaleBasket::GetList(
             array(),
             $userFilter + array("CAN_BUY" => "Y", "DELAY" => "N", "SUBSCRIBE" => "N"),
             false,
@@ -1752,7 +1752,7 @@ class BXHelper {
 
         while ($arItem = $rsBasket->Fetch())
         {
-            if (CSaleBasketHelper::isSetItem($arItem))
+            if (\CSaleBasketHelper::isSetItem($arItem))
                 continue;
             $arBasketItems[] = $arItem;
         }
@@ -1773,7 +1773,7 @@ class BXHelper {
 
     public static function calculateBasket($arBasketItems)
     {
-        CModule::IncludeModule('sale');
+        \CModule::IncludeModule('sale');
         $totalPrice = 0;
         $totalWeight = 0;
 
@@ -1853,7 +1853,7 @@ class BXHelper {
                     $output = shell_exec($program." -i ".$file."  2>&1");
                     if (preg_match("/Duration: (\d\d:\d\d:\d\d)/",$output, $match)) {
                         if (!empty($format)) {
-                            $result['RESULT'] = BXHelper::convert_strtime($match[1],"H:i:s",$format);
+                            $result['RESULT'] = static::convert_strtime($match[1],"H:i:s",$format);
                         } else {
                             $result['RESULT'] = $match[1];
                         }
@@ -1887,7 +1887,7 @@ class BXHelper {
                     if (file_exists($output)) {
                         if (intval($width) && intval($height)) {
                             $obFile = new CFile();
-                            $arFile = CFile::MakeFileArray($output);
+                            $arFile = \CFile::MakeFileArray($output);
                             $checkfile = $obFile->CheckFile($arFile,400000,'image/','gif,png,jpeg,jpg');
                             if (empty($checkfile)) {
                                 $obFile->ResizeImage(
@@ -1931,7 +1931,7 @@ class BXHelper {
         return false;
     }
     public static function  convert_strtime($strtime, $from, $to) {
-        return DateTime::createFromFormat($from,$strtime)->format($to);
+        return \DateTime::createFromFormat($from,$strtime)->format($to);
     }
 
     public  static function  build_cli_args($var) {
@@ -1941,12 +1941,12 @@ class BXHelper {
     public static function seconds_to_format($seconds, $format = "H:i:s") {
         if (intval($seconds))
             return date($format,strtotime(date("d.m.Y 00:00:00", time()))+$seconds);
-         else
+        else
             return false;
     }
     public static function bx_format_price($price_codes, $arItem) {
-        $arCatalogPrices = CIBlockPriceTools::GetCatalogPrices($arItem['IBLOCK_ID'], $price_codes);
-        return CIBlockPriceTools::GetItemPrices($arItem['IBLOCK_ID'], $arCatalogPrices, $arItem);
+        $arCatalogPrices = \CIBlockPriceTools::GetCatalogPrices($arItem['IBLOCK_ID'], $price_codes);
+        return \CIBlockPriceTools::GetItemPrices($arItem['IBLOCK_ID'], $arCatalogPrices, $arItem);
     }
     public static function trace($show_args=false, $for_web=true, $return=false){
         if ($for_web){
@@ -2003,7 +2003,7 @@ class BXHelper {
 
 }
 
-class CIBlockPirogovProperty extends CIBlockProperty {
+class CIBlockPirogovProperty extends \CIBlockProperty {
     public static function GetList($arOrder=Array(), $arFilter=Array())
     {
         global $DB;
@@ -2034,7 +2034,7 @@ class CIBlockPirogovProperty extends CIBlockProperty {
                     break;
                 case "?CODE":
                 case "?NAME":
-                    $arSqlSearch[] = CIBlock::FilterCreate("BP.".substr($key, 1), $val, "string", "E");
+                    $arSqlSearch[] = \CIBlock::FilterCreate("BP.".substr($key, 1), $val, "string", "E");
                     break;
                 case "CODE":
                 case "NAME":
@@ -2124,7 +2124,7 @@ class CIBlockPirogovProperty extends CIBlockProperty {
 				ORDER BY ".implode(", ", $arSqlOrder)."
 			";
         $res = $DB->Query($strSql, false, "FILE: ".__FILE__."<br> LINE: ".__LINE__);
-        $res = new CIBlockPropertyResult($res);
+        $res = new \CIBlockPropertyResult($res);
         return $res;
     }
 }
