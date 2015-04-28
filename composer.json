@@ -1,8 +1,9 @@
 {
-    "name": "weaverryan/derp-dangerzone",
+    "name": "firestorm23/bxhelper",
+    "version": "dev-master",
     "autoload": {
         "psr-0" : {
-            "Weaverryan\\DangerZone" : "src"
+            "Firestorm\\BXHelper" : "src"
         }
     }
 }
