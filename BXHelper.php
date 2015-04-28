@@ -1,4 +1,6 @@
 <?
+namespace Firestorm;
+
 CModule::IncludeModule('iblock');
 
 class BXHelper {
