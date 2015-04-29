@@ -5,5 +5,11 @@
         "psr-0" : {
             "Firestorm\\BXHelper" : "src"
         }
-    }
+    },
+    "require": {
+        "php": ">=5.3",
+        "ext-melt":"*",
+        "ext-ffmpeg":"*",
+        "sunra/php-simple-html-dom-parser": "v1.5.0"
+    },
 }
