@@ -23,18 +23,6 @@ class BXHelper {
         }
     }
     
-    public static function getUserDisplayName($user_id, $arUsers = array()) {
-        if (empty($arUsers)) {
-            $arUsers = BXHelper::getUserVariants($user_id);
-        }
-        if (!empty($arUsers[$user_id]['NAME']) && !empty($arUsers[$user_id]['LAST_NAME'])) {
-            $display_name = $arUsers[$user_id]['NAME']." ".$arUsers[$user_id]['LAST_NAME'];
-        } else {
-            $display_name = $arUsers[$user_id]['LOGIN'];
-        }
-        return $display_name;
-    }
-    
     public static function clearArray($arr, $only_full_null = false, $reset_keys = false) {
         $nulled_count = 0;
         if (is_array($arr)) {
