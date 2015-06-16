@@ -259,7 +259,7 @@ class BXHelper {
             }
         }
     }
-    public static function getElements($arOrder, $arFilter, $arGroup, $arNavigation, $arSelect, $use_cache = true, $field_as_key = false)
+    public static function getElements($arOrder, $arFilter, $arGroup, $arNavigation, $arSelect, $use_cache = true, $field_as_key = false, $get_sections = false)
     {
         $param_string = serialize(func_get_args());
         if ($use_cache) $result = static::getCache(__FUNCTION__.$param_string.'_list');
@@ -286,8 +286,15 @@ class BXHelper {
                 while ($next = $dbResult->GetNextElement()) {
                     $properties = $next->GetProperties();
                     $fields = $next->GetFields();
+                    $sections = array();
+                    if ($get_sections) {
+                    	$dbSections = $next->GetGroups();
+                    	while ($next = $dbSections->GetNext()) {
+                    		$sections[] = $next['ID'];
+                    	}
+                    }
                     if (!$field_as_key) {
-                        $result['RESULT'][] = array_merge($fields, array('PROPERTIES' => $properties));
+                        $result['RESULT'][] = array_merge($fields, array('PROPERTIES' => $properties, 'SECTIONS' => $sections));
                     } else {
                         $fkey = $fields[$field_as_key];
                         $pkey = $properties[$field_as_key]['VALUE'];
@@ -296,19 +303,18 @@ class BXHelper {
                                 if (empty($result['RESULT'][$fkey][0])) {
                                     $result['RESULT'][$fkey]= array($result['RESULT'][$fkey]);
                                 }
-                                $result['RESULT'][$fkey] = array_merge($fields, array('PROPERTIES' => $properties));
-
+                                $result['RESULT'][$fkey] = array_merge($fields, array('PROPERTIES' => $properties, 'SECTIONS' => $sections));
                             } else {
-                                $result['RESULT'][$fkey] = array_merge($fields, array('PROPERTIES' => $properties));
+                                $result['RESULT'][$fkey] = array_merge($fields, array('PROPERTIES' => $properties, 'SECTIONS' => $sections));
                             }
                         } else if (isset($pkey)) {
                             if (!empty($result['RESULT'][$pkey])) {
                                 if (empty($result['RESULT'][$pkey][0])) {
                                     $result['RESULT'][$pkey]= array($result['RESULT'][$pkey]);
                                 }
-                                $result['RESULT'][$pkey][] = array_merge($fields, array('PROPERTIES' => $properties));
+                                $result['RESULT'][$pkey][] = array_merge($fields, array('PROPERTIES' => $properties, 'SECTIONS' => $sections));
                             } else {
-                                $result['RESULT'][$pkey] = array_merge($fields, array('PROPERTIES' => $properties));
+                                $result['RESULT'][$pkey] = array_merge($fields, array('PROPERTIES' => $properties, 'SECTIONS' => $sections));
                             }
                         }
                     }
