@@ -1956,6 +1956,17 @@ class BXHelper {
         $arCatalogPrices = \CIBlockPriceTools::GetCatalogPrices($arItem['IBLOCK_ID'], $price_codes);
         return \CIBlockPriceTools::GetItemPrices($arItem['IBLOCK_ID'], $arCatalogPrices, $arItem);
     }
+    
+    public static function can_show_form($form_id) {
+        return $_REQUEST['WEB_FORM_ID'] == $form_id ||
+            !intval($_REQUEST['WEB_FORM_ID']) &&
+                empty($_REQUEST['Login']) &&
+                empty($_REQUEST['register_submit_button']) &&
+                empty($_REQUEST['save']) &&
+                empty($_REQUEST["AUTH_FORM"]) &&
+                empty($_REQUEST["AJAX_FILTER"]);
+    }
+    
     public static function trace($show_args=false, $for_web=true, $return=false){
         if ($for_web){
             $before = '<b>';
